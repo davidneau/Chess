@@ -2,47 +2,103 @@ from tkinter import *
 from PIL import Image, ImageTk
 import numpy as np
 
-fen=Tk()
-COTE = 400
+class Chess():
+    def __init__(self):
+        self.fen = Tk()
+        self.COTE = 400
+        self.case = int(self.COTE/8)
+        self.can=Canvas(self.fen,bg="light gray", height=self.COTE+self.case, width=self.COTE)
+        self.can.pack()
+        self.point_ref = (0,self.case)
+        self.click = False
+        self.old_x = 0
+        self.old_y = 0
+        self.current_piece = ""
+        self.deplacement = {"Tour"}
+        self.photo_list =  []
+        self.corresp_piece = {"bt":"BTour", "bc":"BChev", "bf":"BFou", "bq":"BReine", "bk":"BRoi", "bp":"BPion",
+                              "nt":"NTour", "nc":"NChev", "nf":"NFou", "nq":"NReine", "nk":"NRoi", "np":"NPion"}
+        self.grill = np.array([["bt","bc","bf","bq","bk","bf","bc","bt"],
+                               ["bp","bp","bp","bp","bp","bp","bp","bp"],
+                               ["","","","","","","",""],
+                               ["","","","","","","",""],
+                               ["","","","","","","",""],
+                               ["","","","","","","",""],
+                               ["np","np","np","np","np","np","np","np"],
+                               ["nt","nc","nf","nk","nq","nf","nc","nt"]])
+        self.init_board()
+        def callback(event):
+            x, y = self.whereOn(event.x, event.y)
+            print("clicked at", x, y)
+            if self.click == True:
+                if (self.old_x + self.old_y)%2 ==0:
+                    self.can.create_rectangle(self.old_x*self.case,(self.old_y+1)*self.case,(self.old_x+1)*self.case,(self.old_y+2)*self.case, fill="white")
+                else:
+                    self.can.create_rectangle(self.old_x*self.case,(self.old_y+1)*self.case,(self.old_x+1)*self.case,(self.old_y+2)*self.case, fill="#333333")
+                self.put_img((x*self.case) + self.case /2,((y+1)*(self.case)) + self.case/2,"icon/" + self.corresp_piece[self.current_piece] + ".png")
+                self.click = False
+                self.grill[self.old_y, self.old_x] = ""
+                self.grill[y, x] = self.current_piece
+                self.current_piece = ""
+            else:
+                self.current_piece = self.grill[y,x]
+                self.old_x = x
+                self.old_y = y
+                self.click = True
+        self.can.bind("<Button-1>", callback)
+        print(self.grill)
+        self.fen.mainloop()
 
-case = int(COTE/8)
-can=Canvas(fen,bg="light gray", height=COTE+case, width=COTE)
-can.pack()
-point_ref = (0,case)
-click = False
-old_x = 0
-old_y = 0
+    def init_board(self):
+        for i in range(8):
+            for j in range(8):
+                if (i+j)%2 == 0:
+                    self.can.create_rectangle(self.point_ref[0]+i*self.case,self.point_ref[1]+j*self.case,self.point_ref[0]+(i+1)*self.case,self.point_ref[1]+(j+1)*self.case, fill ="white")
+                else:
+                    self.can.create_rectangle(self.point_ref[0]+i*self.case,self.point_ref[1]+j*self.case,self.point_ref[0]+(i+1)*self.case,self.point_ref[1]+(j+1)*self.case, fill ="#333333")
+        i = self.case
+        self.put_img(25,75,"icon/BTour.png")
+        self.put_img(i+25,75,"icon/BChev.png")
+        self.put_img(2*i+25,75,"icon/BFou.png")
+        self.put_img(3*i+25,75,"icon/BReine.png")
+        self.put_img(4*i+25,75,"icon/BRoi.png")
+        self.put_img(5*i+25,75,"icon/BFou.png")
+        self.put_img(6*i+25,75,"icon/BChev.png")
+        self.put_img(7*i+25,75,"icon/BTour.png")
+        self.put_img(25,i+75,"icon/BPion.png")
+        self.put_img(i+25,i+75,"icon/BPion.png")
+        self.put_img(2*i+25,i+75,"icon/BPion.png")
+        self.put_img(3*i+25,i+75,"icon/BPion.png")
+        self.put_img(4*i+25,i+75,"icon/BPion.png")
+        self.put_img(5*i+25,i+75,"icon/BPion.png")
+        self.put_img(6*i+25,i+75,"icon/BPion.png")
+        self.put_img(7*i+25,i+75,"icon/BPion.png")
+        self.put_img(25,7*i+75,"icon/NTour.png")
+        self.put_img(i+25,7*i+75,"icon/NChev.png")
+        self.put_img(2*i+25,7*i+75,"icon/NFou.png")
+        self.put_img(3*i+25,7*i+75,"icon/NReine.png")
+        self.put_img(4*i+25,7*i+75,"icon/NRoi.png")
+        self.put_img(5*i+25,7*i+75,"icon/NFou.png")
+        self.put_img(6*i+25,7*i+75,"icon/NChev.png")
+        self.put_img(7*i+25,7*i+75,"icon/NTour.png")
+        self.put_img(25,6*i+75,"icon/NPion.png")
+        self.put_img(i+25,6*i+75,"icon/NPion.png")
+        self.put_img(2*i+25,6*i+75,"icon/NPion.png")
+        self.put_img(3*i+25,6*i+75,"icon/NPion.png")
+        self.put_img(4*i+25,6*i+75,"icon/NPion.png")
+        self.put_img(5*i+25,6*i+75,"icon/NPion.png")
+        self.put_img(6*i+25,6*i+75,"icon/NPion.png")
+        self.put_img(7*i+25,6*i+75,"icon/NPion.png")
 
-for i in range(8):
-    for j in range(8):
-        if (i+j)%2 == 0:
-            can.create_rectangle(point_ref[0]+i*case,point_ref[1]+j*case,point_ref[0]+(i+1)*case,point_ref[1]+(j+1)*case, fill ="white")
-        else:
-            can.create_rectangle(point_ref[0]+i*case,point_ref[1]+j*case,point_ref[0]+(i+1)*case,point_ref[1]+(j+1)*case, fill ="black")
+    def put_img(self,x,y,strimage):
+        img = PhotoImage(file=strimage)
+        self.can.create_image(x,y,image=img)
+        self.photo_list.append(img)
+        self.can.grid()
+
+    def whereOn(self,x,y):
+        return(x//self.case, (y//self.case) -1)
 
 
-image = Image.open("BQueen.jpg")
-photo = ImageTk.PhotoImage(image.resize((50,50)))
 
-can.create_image(25,75,image=photo)
-
-def whereOn(x,y):
-    return(x//case, (y//case) -1)
-
-def callback(event):
-    global click
-    global old_x, old_y
-    x, y = whereOn(event.x, event.y)
-    print("clicked at", x, y)
-    if click == True:
-        print("carré blanc a :",old_x*case,old_y*(case+1),old_x*(case+1),old_y*(case+2))
-        can.create_rectangle(old_x*case,(old_y+1)*case,(old_x+1)*case,(old_y+2)*case, fill="white")
-        can.create_image((x*case) + case /2,((y+1)*(case)) + case/2,image=photo)
-        click = False
-    else:
-        old_x = x
-        old_y = y
-        click = True
-
-can.bind("<Button-1>", callback)
-fen.mainloop()
+Ch = Chess()
